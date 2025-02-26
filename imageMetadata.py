@@ -13,6 +13,8 @@ def getStrippedFile(file: str) -> tuple[str, str]:
         if "WA" in file:
             strippedFile: str = file.split("WA")[0].rstrip("-_ ")
             appSpecification: str = "WhatsApp"
+        else:
+            appSpecification: None = None
     elif file.startswith(("Screenshot", "SVID")):
         strippedFile: str = file[10:].lstrip("-_")
         appSpecification: str = file[27:].rsplit(".", 1)[0]
