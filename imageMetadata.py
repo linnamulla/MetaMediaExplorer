@@ -22,6 +22,7 @@ def getMetadataList(sourceFolder: str) -> list[dict]:
                     imageDictionary["file"] = file
                     imageDictionary["folder"] = os.path.basename(roots)
                     imageDictionary["path"] = roots
+                    _, imageDictionary["type"] = os.path.splitext(file)
 
                     imageCreationEpoch: float = os.path.getctime(fileName)
                     imageCreationTime: str = time.strftime('%Y:%m:%d %H:%M:%S', time.gmtime(imageCreationEpoch))
@@ -68,6 +69,50 @@ def getMetadataList(sourceFolder: str) -> list[dict]:
                                 imageMetadata: None = None
                         imageDictionary[imageTag] = imageMetadata
                     
+                    imageDictionaryList.append(imageDictionary)
+                elif file.endswith((".mp4", ".MP4", ".mov", ".MOV")) == True: 
+                    fileName: str = str(roots + "\\" + file)
+                    print(f"Retrieving metadata for file: {fileName}")
+
+                    imageDictionary: dict = {}
+
+                    imageDictionary["file"] = file
+                    imageDictionary["folder"] = os.path.basename(roots)
+                    imageDictionary["path"] = roots
+                    _, imageDictionary["type"] = os.path.splitext(file)
+
+                    imageCreationEpoch: float = os.path.getctime(fileName)
+                    imageCreationTime: str = time.strftime('%Y:%m:%d %H:%M:%S', time.gmtime(imageCreationEpoch))
+                    imageDictionary["creation"] = imageCreationTime
+
+                    imageModifiedEpoch: float = os.path.getmtime(fileName)
+                    imageModifiedTime: str = time.strftime('%Y:%m:%d %H:%M:%S', time.gmtime(imageModifiedEpoch))
+                    imageDictionary["modified"] = imageModifiedTime
+
+                    if file.startswith(("VID", "WIN")):
+                        strippedFile: str = file[3:].lstrip("-_")
+                        if "WA" in file:
+                            strippedFile: str = file.split("WA")[0].rstrip("-_ ")
+                        appSpecification: None = None
+                    elif file.startswith("SVID"):
+                            strippedFile: str = file[10:].lstrip("-_")
+                            appSpecification: str = file[27:].rsplit(".", 1)[0]
+                        
+                    else:
+                        strippedFile: str = file
+                        appSpecification: None = None
+
+                    try:
+                        imageRecordedTime: str = parse(strippedFile, yearfirst = True, fuzzy = True).strftime('%Y:%m:%d %H:%M:%S')
+                        imageDictionary["recorded"] = imageRecordedTime
+                    except:
+                        pass
+
+                    imageDictionary["app"] = appSpecification
+
+                    imageFilesize: int = os.path.getsize(fileName)
+                    imageDictionary["filesize"] = imageFilesize
+
                     imageDictionaryList.append(imageDictionary)
                 else:
                      print(f"Cannot access metadata for {file}, moving on...")
