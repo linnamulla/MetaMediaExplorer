@@ -10,9 +10,9 @@ import time
 def getStrippedFile(file: str) -> tuple[str, str]:
     if file.startswith("IMG"):
         strippedFile: str = file[3:].lstrip("-_")
-    if "WA" in file:
-        strippedFile: str = file.split("WA")[0].rstrip("-_ ")
-        appSpecification: None = None
+        if "WA" in file:
+            strippedFile: str = file.split("WA")[0].rstrip("-_ ")
+            appSpecification: str = "WhatsApp"
     elif file.startswith("Screenshot"):
         strippedFile: str = file[10:].lstrip("-_")
         appSpecification: str = file[27:].rsplit(".", 1)[0]
