@@ -7,26 +7,26 @@ from PIL.ExifTags import TAGS
 import time
 
 # Get the stripped file name and app specification
-def getStrippedFile(file: str) -> tuple[str, str]:
+def getFileStripped(file: str) -> tuple[str, str]:
     if file.startswith(("IMG", "VID")):
-        strippedFile: str = file[3:].lstrip("-_")
+        fileStripped: str = file[3:].lstrip("-_")
         if "WA" in file:
-            strippedFile: str = file.split("WA")[0].rstrip("-_ ")
+            fileStripped: str = file.split("WA")[0].rstrip("-_ ")
             appSpecification: str = "WhatsApp"
         else:
             appSpecification: None = None
     elif file.startswith(("Screenshot", "SVID")):
-        strippedFile: str = file[10:].lstrip("-_")
+        fileStripped: str = file[10:].lstrip("-_")
         appSpecification: str = file[27:].rsplit(".", 1)[0]
     else:
-        strippedFile: str = file
+        fileStripped: str = file
         appSpecification: None = None
-    return strippedFile, appSpecification
+    return fileStripped, appSpecification
     
 # Get the recorded time of the image
-def getRecordedTime(strippedFile: str) -> str:
+def getRecordedTime(fileStripped: str) -> str:
     try:
-        imageRecordedTime: str = parse(timestr = strippedFile, yearfirst = True, fuzzy = True).strftime('%Y:%m:%d %H:%M:%S')
+        imageRecordedTime: str = parse(timestr = fileStripped, yearfirst = True, fuzzy = True).strftime('%Y:%m:%d %H:%M:%S')
     except:
         imageRecordedTime: None = None
     return imageRecordedTime
@@ -43,7 +43,7 @@ def getTime(path: str) -> tuple[str, str]:
     return imageCreationTime, imageModifiedTime
 
 # Get the exif data of the image
-def getExifData(path: str, imageDictionary: dict) -> dict[str: str]:
+def getExifData_ForDictionary(path: str, imageDictionary: dict) -> dict[str: str]:
     imageData: Image = Image.open(path)
     imageExifData: object = imageData.getexif()
     for imageTagId in imageExifData:
@@ -57,15 +57,15 @@ def getExifData(path: str, imageDictionary: dict) -> dict[str: str]:
         imageDictionary[imageTag] = mediaMetaData
     return imageDictionary
 
-def getRegularDictionary(roots: str, file: str) -> tuple[str, dict[str: str]]:
+def getRegularData_ForDictionary(roots: str, file: str) -> tuple[str, dict[str: str]]:
     # Get the path of the file
     path: str = str(roots + "\\" + file)
     # Print the path of the file
     print(f"Retrieving metadata for file: {path}")
 
     # Get the regular meta data of the image
-    strippedFile, appSpecification = getStrippedFile(file)
-    imageRecordedTime = getRecordedTime(strippedFile)
+    fileStripped, appSpecification = getFileStripped(file)
+    imageRecordedTime = getRecordedTime(fileStripped)
     imageCreationTime, imageModifiedTime = getTime(path)
 
     # Create a dictionary with the meta data
@@ -83,7 +83,7 @@ def getRegularDictionary(roots: str, file: str) -> tuple[str, dict[str: str]]:
     return path, imageDictionary
 
 # Get the metadata of the images in the folder
-def getMetadataList(sourceFolder: str, supportedTypes: list[tuple]) -> list[dict]:
+def getDataDictionaryList(sourceFolder: str, supportedTypes: list[tuple]) -> list[dict]:
 
     imageDictionaryList: list = []
 
@@ -93,10 +93,10 @@ def getMetadataList(sourceFolder: str, supportedTypes: list[tuple]) -> list[dict
             for file in files:
                 if file.lower().endswith(supportedTypes[0]) == True: # For image files
                     ## Get the regular meta data of the image
-                    path, imageDictionary = getRegularDictionary(roots, file)
+                    path, imageDictionary = getRegularData_ForDictionary(roots, file)
 
                     ## Get the exif data of the image and add it to the dictionary
-                    imageDictionary: dict[str : str] = getExifData(path, imageDictionary)
+                    imageDictionary: dict[str : str] = getExifData_ForDictionary(path, imageDictionary)
 
                     ## Append the dictionary to the list
                     imageDictionaryList.append(imageDictionary)
@@ -104,13 +104,13 @@ def getMetadataList(sourceFolder: str, supportedTypes: list[tuple]) -> list[dict
                 elif file.lower().endswith(supportedTypes[1]) == True: # For video files
 
                     ## Get the regular meta data of the image
-                    _, imageDictionary = getRegularDictionary(roots, file)
+                    _, imageDictionary = getRegularData_ForDictionary(roots, file)
 
                     ## Append the dictionary to the list
                     imageDictionaryList.append(imageDictionary)
                                                
                 else: # For other files
-                     print(f"Cannot access metadata for {file}, moving on...")
+                     print(f"Cannot access metadata for file: {file} - moving on...")
 
     return imageDictionaryList
 
@@ -122,7 +122,7 @@ if __name__ == "__main__":
     sourceFolder: str = input("")
 
     # Get the metadata list
-    metaDataList: list[dict] = getMetadataList(sourceFolder, supportedTypes)
+    metaDataList: list[dict] = getDataDictionaryList(sourceFolder, supportedTypes)
 
     # Create a dataframe with the metadata
     df: pd.DataFrame = pd.DataFrame(metaDataList)
