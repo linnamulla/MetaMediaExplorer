@@ -2,21 +2,21 @@ from dateutil.parser import *
 import os
 import time
 
-# Get the stripped file name and app specification
+# Get the stripped file name and app name from the file name
 def getFileStripped(file: str) -> tuple[str, str]:
     if file.startswith(("IMG", "VID")):
         fileStripped: str = file[3:].lstrip("-_")
         if "WA" in file:
             fileStripped: str = file.split("WA")[0].rstrip("-_ ")
-            fileApp: str = "WhatsApp"
+            fileApp: str = "WhatsApp" # Get the app name from the file name
         else:
-            fileApp: None = None
+            fileApp: str = None
     elif file.startswith(("Screenshot", "SVID")):
         fileStripped: str = file[10:].lstrip("-_")
-        fileApp: str = file[27:].rsplit(".", 1)[0]
+        fileApp: str = file[27:].rsplit(".", 1)[0] # Get the app name from the file name
     else:
-        fileStripped: str = file
-        fileApp: None = None
+        fileStripped: str = file # No stripping needed
+        fileApp: str = None # No app name in the file name
     return fileStripped, fileApp
     
 # Get the recorded time of the file
@@ -24,7 +24,7 @@ def getRecordedTime(fileStripped: str) -> str:
     try:
         fileRecorded: str = parse(timestr = fileStripped, yearfirst = True, fuzzy = True).strftime('%Y:%m:%d %H:%M:%S')
     except:
-        fileRecorded: None = None
+        fileRecorded: str = None
     return fileRecorded
 
 # Get the creation and modified time of the file
@@ -49,14 +49,14 @@ def getRegularData_ForDictionary(roots: str, file: str) -> tuple[str, dict[str: 
 
     # Create a dictionary with the meta data
     metaDataDictionary: dict[str : str] = {"path": path,
-                                        "root": roots,
-                                        "file": file,
-                                        "folder": os.path.basename(roots),
-                                        "type": os.path.splitext(file)[1],
-                                        "filesize": os.path.getsize(path),
-                                        "creation": fileCreation,
-                                        "modified": fileModified,
-                                        "recorded": fileRecorded,
-                                        "app": fileApp}
+                                           "root": roots,
+                                           "file": file,
+                                           "folder": os.path.basename(roots),
+                                           "type": os.path.splitext(file)[1],
+                                           "filesize": os.path.getsize(path),
+                                           "creation": fileCreation,
+                                           "modified": fileModified,
+                                           "recorded": fileRecorded,
+                                           "app": fileApp}
     
     return path, metaDataDictionary
