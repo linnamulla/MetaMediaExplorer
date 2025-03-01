@@ -3,7 +3,7 @@ import PIL
 
 from metaDataList import getDataDictionaryList
 
-def extractData(maxImagePixels = None, supportedTypes = [(".jpg", ".jpeg", ".png"), (".mp4", ".mov")]) -> None:
+def extractData(sourceFolder, maxImagePixels = None, supportedTypes = [(".jpg", ".jpeg", ".png"), (".mp4", ".mpg", ".mov")]) -> None:
     PIL.Image.MAX_IMAGE_PIXELS = maxImagePixels   # To avoid the decompression bomb error
 
     # Get the metadata list
@@ -15,7 +15,7 @@ def extractData(maxImagePixels = None, supportedTypes = [(".jpg", ".jpeg", ".png
     # Save the dataframe to a csv file
     df.to_csv(path_or_buf = (sourceFolder + "\\.mediaMetaData.csv"), sep = ";")
 
-if __name__ == "main":
+if __name__ == "__main__":
     print("\nPlease enter name of source folder:")
     sourceFolder: str = input("")
     extractData(sourceFolder)
