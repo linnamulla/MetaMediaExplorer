@@ -49,7 +49,6 @@ def getRegularData_ForDictionary(roots: str, file: str) -> tuple[str, dict[str: 
 
     # Create a dictionary with the meta data
     metaDataDictionary: dict[str : str] = {"path": path,
-                                           "root": roots,
                                            "file": file,
                                            "folder": os.path.basename(roots),
                                            "type": os.path.splitext(file)[1],

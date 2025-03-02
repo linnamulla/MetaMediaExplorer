@@ -3,7 +3,7 @@ import PIL
 
 from extraction.metaDataList import getDataDictionaryList
 
-def extractData(sourceFolder, maxImagePixels = None, supportedTypes = [(".jpg", ".jpeg", ".png"), (".mp4", ".mpg", ".mov")]) -> None:
+def extractData(sourceFolder, maxImagePixels = None, supportedTypes = [(".jpg", ".jpeg", ".png"), (".mov", ".mp4", ".mpg", ".mts")]) -> None:
     PIL.Image.MAX_IMAGE_PIXELS = maxImagePixels   # To avoid the decompression bomb error
 
     # Get the metadata list
