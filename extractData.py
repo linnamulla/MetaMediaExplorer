@@ -11,8 +11,3 @@ def extractData(sourceFolder, maxImagePixels = None, supportedTypes = [(".jpg", 
 
     # Create a dataframe with the meta data and save it as a csv file
     pd.DataFrame(metaDataList).to_csv(path_or_buf = (sourceFolder + "\\.mediaMetaData.csv"), sep = ";")
-
-if __name__ == "__main__":
-    print("\nPlease enter name of source folder:")
-    sourceFolder: str = input("")
-    extractData(sourceFolder)

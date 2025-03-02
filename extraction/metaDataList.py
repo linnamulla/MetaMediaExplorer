@@ -1,7 +1,7 @@
 import os
 
-from exifData import getExifData_ForDictionary
-from regularData import getRegularData_ForDictionary
+from extraction.exifData import getExifData_ForDictionary
+from extraction.regularData import getRegularData_ForDictionary
 
 # Get the meta data of the files in the folder
 def getDataDictionaryList(sourceFolder: str, supportedTypes: list[tuple]) -> list[dict]:
