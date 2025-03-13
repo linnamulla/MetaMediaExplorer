@@ -23,25 +23,25 @@ def main() -> str:
                 print(str(e), "ValueError. Please enter a valid source folder.", sep = "\n")
             finally:
                 return sourceFolder
+            
+def removeNonAlpha(s):
+    return ''.join(c for c in s if c.isalpha())
 
 def renameFilesFromDataFrame(df) -> None:
     for index, row in df.iterrows():
         initialPath: str = row['path']
         initialFileName: str = os.path.basename(initialPath)
-        newFileName: str = str(row['indicated']) + "_" + str(row['folder']) + "_" + str(row['file'])
+        if removeNonAlpha(str(row['file']).split('.')[0]) != "":
+            newFileName: str = str(row['indicated']) + "_" + removeNonAlpha(str(row['folder'])) + "_" + removeNonAlpha(str(row['file']).split('.')[0]) + str(row['type'])
+        else:
+            newFileName: str = str(row['indicated']) + "_" + removeNonAlpha(str(row['folder'])) + str(row['type'])
+            
         directory: str = os.path.dirname(initialPath)
         newPath: str = os.path.join(directory, newFileName)
 
         if os.path.exists(initialPath):
-            print(f"\nFor file: '{initialFileName}' in directory: '{directory}',")
-            confirm = str(input(f"Rename to: '{newFileName}'? (Y/N): "))
-            if confirm.upper != "Y":
                 shutil.move(initialPath, newPath)
-                print(f"\nRenamed '{initialFileName}' to '{newFileName}', in directory: '{directory}'")
-            elif confirm.upper == "N":
-                print(f"\nDid not rename '{initialFileName}' in directory: '{directory}'")
-            else:
-                print(f"\nDid not rename '{initialFileName}' in directory: '{directory}'")
+                print(f"Renamed '{initialFileName}' to '{newFileName}', in directory: '{directory}'")
         else:
             print(f"File not found: '{initialFileName}' in directory: '{directory}'")
 

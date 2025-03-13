@@ -33,18 +33,24 @@ def selectDateTime(df, dateTimeCol='DateTime', recordedCol='recorded', modifiedC
             modifiedVal = int(str(row[modifiedCol])[:4]) if pd.notna(row[modifiedCol]) else None
             creationVal = int(str(row[creationCol])[:4]) if pd.notna(row[creationCol]) else None
 
-            if dateTimeVal:
-                filtered.append(row[dateTimeCol])
-            elif recordedVal and modifiedVal and recordedVal == modifiedVal:
-                filtered.append(row[recordedCol])
-            elif recordedVal and modifiedVal and recordedVal < modifiedVal:
-                filtered.append(row[recordedCol])
-            elif recordedVal and creationVal and modifiedVal == creationVal:
-                filtered.append(row[modifiedVal])
-            elif modifiedVal and creationVal and modifiedVal < creationVal:
-                filtered.append(row[modifiedCol])
+            if recordedVal:
+                if dateTimeVal:
+                    if dateTimeVal < recordedVal:
+                        filtered.append(row[dateTimeCol])
+                    elif dateTimeVal > recordedVal:
+                        filtered.append(row[recordedCol])
+                else:
+                    filtered.append(row[recordedCol])
+            elif modifiedVal and creationVal:
+                if modifiedVal <= creationVal:
+                    filtered.append(row[modifiedCol])
+                else:
+                    filtered.append(row[creationCol])
+            elif modifiedVal:
+                filtered.append(row[creationCol])
             else:
                 filtered.append(row[creationCol])
+
         except ValueError:
             filtered.append(None)
 
