@@ -25,6 +25,7 @@ def transformData(sourceFolder: str, dropEmptyCols: bool = True, dropFloatCols: 
         df: pd.DataFrame = df.drop(df.select_dtypes(include = ["float64"]).columns.difference(["GPSInfo"]), axis = 1)
 
     # Get the information of the dataframe
+    print("\nShowing columns for dataframe:\n")
     print(df.info(verbose = True, show_counts = True))
 
     # Save the dataframe as a csv file

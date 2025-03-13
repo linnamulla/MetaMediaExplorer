@@ -50,6 +50,6 @@ def selectDateTime(df, dateTimeCol='DateTime', recordedCol='recorded', modifiedC
 
     df.insert(6, newCol, filtered)
 
-    df["filtered"] = pd.to_datetime(df["filtered"].astype(str).str.replace(":", "-", 2))
+    df["indicated"] = df["filtered"].astype(str).str.replace(":", "", regex=False).str.replace(" ", "_", regex=False)
 
     return df
