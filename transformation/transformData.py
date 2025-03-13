@@ -12,9 +12,9 @@ def transformData(sourceFolder: str, dropEmptyCols: bool = True, dropFloatCols: 
     # Set index and sort the dataframe
     ## Drop the first column of the dataframe
     df: pd.DataFrame = df.drop(df.columns[0], axis = 1)
-    ## Set index as the path column and sort ascending by the filtered column
+    ## Set index as the path column and sort descending by the filesize column
     df: pd.DataFrame = df.set_index("path")
-    df: pd.DataFrame = df.sort_values(by = "filtered", ascending = True)
+    df: pd.DataFrame = df.sort_values(by = "filesize", ascending = False)
 
     # Drop the empty columns of the dataframe
     if dropEmptyCols == True:
@@ -25,6 +25,7 @@ def transformData(sourceFolder: str, dropEmptyCols: bool = True, dropFloatCols: 
         df: pd.DataFrame = df.drop(df.select_dtypes(include = ["float64"]).columns.difference(["GPSInfo"]), axis = 1)
 
     # Get the information of the dataframe
+    print("\nShowing columns for dataframe:\n")
     print(df.info(verbose = True, show_counts = True))
 
     # Save the dataframe as a csv file
