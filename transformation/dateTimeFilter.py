@@ -1,7 +1,7 @@
 from datetime import datetime
 import pandas as pd
 
-def reorderColumns(df: pd.DataFrame) -> None:
+def reorderTimeColumns(df: pd.DataFrame) -> None:
     # Reorder the columns that contain date and time
     ## Get the columns of the dataframe
     cols = list(df.columns)
@@ -11,7 +11,7 @@ def reorderColumns(df: pd.DataFrame) -> None:
     cols[6:6] = colsDateTime
     df: pd.DataFrame = df[cols]
 
-def filterDateTime(df: pd.DataFrame) -> None:
+def cleanDateTime(df: pd.DataFrame) -> None:
     ## Clean values in the recorded column
     for i in range(len(df["recorded"])):
         try:
