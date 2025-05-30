@@ -1,7 +1,7 @@
 from datetime import datetime
 import pandas as pd
 
-def reorderTimeColumns(df: pd.DataFrame) -> None:
+def reorderColumns(df: pd.DataFrame) -> None:
     # Reorder the columns that contain date and time
     ## Get the columns of the dataframe
     cols = list(df.columns)
@@ -56,3 +56,6 @@ def selectDateTime(df, dateTimeCol='DateTime', recordedCol='recorded', modifiedC
     df.insert(6, newCol, filtered)
     df["indicated"] = df["filtered"].astype(str).str.replace(":", "", regex=False).str.replace(" ", "_", regex=False)
     return df
+
+def filterDateTime(df: pd.DataFrame) -> None:
+    None

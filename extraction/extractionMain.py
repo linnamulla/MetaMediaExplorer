@@ -10,4 +10,4 @@ def extractData(sourceFolder, maxImagePixels = None, supportedTypes = [(".jpg", 
     metaDataList: list[dict] = getDataDictionaryList(sourceFolder, supportedTypes)
 
     # Create a dataframe with the meta data and save it as a csv file
-    pd.DataFrame(metaDataList).to_csv(path_or_buf = (sourceFolder + "\\.mediaMetaData.csv"), sep = ";")
+    pd.DataFrame(metaDataList).to_csv(path_or_buf = (sourceFolder + "\\.mediaMetaDataX.csv"), sep = ";")
