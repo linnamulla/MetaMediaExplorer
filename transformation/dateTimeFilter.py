@@ -20,36 +20,39 @@ def cleanDateTime(df: pd.DataFrame) -> None:
         except ValueError:
             df.loc[i, "recorded"] = None
 
-def findLikelyTime(df, dateTimeCol='DateTime', recordedCol='recorded', modifiedCol='modified', creationCol='creation', newCol='filtered') -> None:
+def selectDateTime(df, dateTimeCol='DateTime', recordedCol='recorded', modifiedCol='modified', creationCol='creation', newCol='filtered') -> pd.DataFrame:
 
     filtered = []
     for index, row in df.iterrows():
         try:
-            dateTimeVal = int(str(row[dateTimeCol])[:4]) if pd.notna(row[dateTimeCol]) else None
-            try:
-                recordedVal = int(str(row[recordedCol])[:4]) if pd.notna(row[recordedCol]) else None
-            except KeyError:
-                recordedVal = None
-            modifiedVal = int(str(row[modifiedCol])[:4]) if pd.notna(row[modifiedCol]) else None
-            creationVal = int(str(row[creationCol])[:4]) if pd.notna(row[creationCol]) else None
+            dateTimeVal = row[dateTimeCol] if pd.notna(row[dateTimeCol]) else None
+            recordedVal = row[recordedCol] if pd.notna(row[recordedCol]) else None
+            modifiedVal = row[modifiedCol] if pd.notna(row[modifiedCol]) else None
+            creationVal = row[creationCol] if pd.notna(row[creationCol]) else None
 
-            if dateTimeVal:
-                filtered.append(row[dateTimeCol])
-            elif recordedVal and modifiedVal and recordedVal == modifiedVal:
-                filtered.append(row[recordedCol])
-            elif recordedVal and modifiedVal and recordedVal < modifiedVal:
-                filtered.append(row[recordedCol])
-            elif recordedVal and creationVal and modifiedVal == creationVal:
-                filtered.append(row[modifiedVal])
-            elif modifiedVal and creationVal and modifiedVal < creationVal:
-                filtered.append(row[modifiedCol])
+            if recordedVal is not None:
+                if dateTimeVal is not None:
+                    if str(dateTimeVal).replace(": ", "") < str(recordedVal).replace(": ", ""):
+                        filtered.append(dateTimeVal)
+                    else:
+                        filtered.append(recordedVal)
+                else:
+                    filtered.append(recordedVal)
+            elif modifiedVal is not None and creationVal is not None:
+                if str(modifiedVal).replace(": ", "") <= str(creationVal).replace(": ", ""):
+                    filtered.append(modifiedVal)
+                else:
+                    filtered.append(creationVal)
+            elif modifiedVal is not None:
+                filtered.append(modifiedVal)
+            elif creationVal is not None:
+                filtered.append(creationVal)
             else:
-                filtered.append(row[creationCol])
-        except ValueError:
+                filtered.append(None)
+        except (ValueError, TypeError):
+            print(f"ValueError or TypeError occurred at index {index}")
             filtered.append(None)
 
     df.insert(6, newCol, filtered)
-
     df["indicated"] = df["filtered"].astype(str).str.replace(":", "", regex=False).str.replace(" ", "_", regex=False)
-
     return df
