@@ -1,5 +1,5 @@
-from extraction.extractData import extractData
-from transformation.transformData import transformData
+from extraction.extractionMain import extractData
+from transformation.transformationMain import transformData
 
 import os
 import pandas as pd
