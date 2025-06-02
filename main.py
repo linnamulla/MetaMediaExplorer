@@ -56,6 +56,7 @@ if __name__ == "__main__":
         exit()
     else:
         try:
-            renameFilesFromDataFrame(df = pd.read_csv(sourceFolder + "\\.mediaMetaData.csv", sep=";"))
+            _ = None
+            #renameFilesFromDataFrame(df = pd.read_csv(sourceFolder + "\\.mediaMetaData.csv", sep=";"))
         except FileNotFoundError:
             print(f"File not found: '{sourceFolder}\\mediaMetaData.csv'. Please ensure the file exists before renaming files. Exiting program.")
