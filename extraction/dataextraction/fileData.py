@@ -18,19 +18,11 @@ def getFileStripped(file: str) -> tuple[str, str]:
         fileStripped: str = file # No stripping needed
         fileApp: str = None # No app name in the file name
     return fileStripped, fileApp
-    
-# Get the recorded time of the file
-def getRecordedTime(fileStripped: str) -> str:
-    try:
-        fileRecorded: str = parse(timestr = fileStripped, yearfirst = True, fuzzy = True).strftime('%Y:%m:%d %H:%M:%S')
-    except:
-        fileRecorded: str = None
-    return fileRecorded
 
 # Get the creation and modified time of the file
 def getCreationModifiedTime(path: str) -> tuple[str, str]:
-    fileCreation: str = time.strftime('%Y:%m:%d %H:%M:%S', time.gmtime(os.path.getctime(path)))
-    fileModified: str = time.strftime('%Y:%m:%d %H:%M:%S', time.gmtime(os.path.getmtime(path)))
+    fileCreation: str = time.strftime('%Y%m%d_%H%M%S', time.gmtime(os.path.getctime(path)))
+    fileModified: str = time.strftime('%Y%m%d_%H%M%S', time.gmtime(os.path.getmtime(path)))
 
     return fileCreation, fileModified
 
@@ -41,12 +33,11 @@ def getRegularData_ForDictionary(roots: str, file: str) -> tuple[str, dict[str: 
     path: str = str(roots + "\\" + file)
     # Print the path of the file
     print(f"Retrieving metadata for file: {path}")
-
-    # Get the regular meta data of the file
-    fileStripped, fileApp = getFileStripped(file)
-    fileRecorded = getRecordedTime(fileStripped)
+    # Get the creation and modified time of the file
     fileCreation, fileModified = getCreationModifiedTime(path)
-
+    # Get the app name from the file name
+    _, fileApp = getFileStripped(file)
+    
     # Create a dictionary with the meta data
     metaDataDictionary: dict[str : str] = {"path": path,
                                            "file": file,
@@ -55,7 +46,7 @@ def getRegularData_ForDictionary(roots: str, file: str) -> tuple[str, dict[str: 
                                            "filesize": os.path.getsize(path),
                                            "creation": fileCreation,
                                            "modified": fileModified,
-                                           "recorded": fileRecorded,
+                                           "recorded": None,
                                            "app": fileApp}
     
     return path, metaDataDictionary

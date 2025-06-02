@@ -1,5 +1,6 @@
 from extraction.extractionMain import extractData
 from transformation.transformationMain import transformData
+from transformation.datetime.datetimeEstimation import estimateStamp
 
 import os
 import pandas as pd
@@ -17,6 +18,8 @@ def main() -> str:
             try:
                 extractData(sourceFolder)
                 transformData(sourceFolder, dropEmptyCols = True, dropFloatCols = True)
+                estimateStamp(sourceFolder)
+                print("\nData extraction and transformation completed successfully.\n")
             except OSError as e:
                 print(str(e), "OSError. Likely causes are: (1) files are being downloaded from cloud access and can't be accessed, or (2) the .csv file is opened by the user and can't be overwritten.", sep = "\n")
             except ValueError as e:
@@ -47,7 +50,11 @@ def renameFilesFromDataFrame(df) -> None:
 
 if __name__ == "__main__":
     sourceFolder = main()
-    if sourceFolder is not None:
+    print(f"Source folder: {sourceFolder}")
+    if sourceFolder is None:
+        print("No source folder provided. Exiting program.")
+        exit()
+    else:
         try:
             renameFilesFromDataFrame(df = pd.read_csv(sourceFolder + "\\.mediaMetaData.csv", sep=";"))
         except FileNotFoundError:

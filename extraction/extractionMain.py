@@ -1,7 +1,7 @@
 import pandas as pd
 import PIL
 
-from extraction.list.metaData import getDataDictionaryList
+from extraction.dictionarylist.metaData import getDataDictionaryList
 
 def extractData(sourceFolder, maxImagePixels = None, supportedTypes = [(".jpg", ".jpeg", ".png"), (".mov", ".mp4", ".mpg", ".mts")]) -> None:
     PIL.Image.MAX_IMAGE_PIXELS = maxImagePixels   # To avoid the decompression bomb error
@@ -10,4 +10,4 @@ def extractData(sourceFolder, maxImagePixels = None, supportedTypes = [(".jpg", 
     metaDataList: list[dict] = getDataDictionaryList(sourceFolder, supportedTypes)
 
     # Create a dataframe with the meta data and save it as a csv file
-    pd.DataFrame(metaDataList).to_csv(path_or_buf = (sourceFolder + "\\.mediaMetaDataX.csv"), sep = ";")
+    pd.DataFrame(metaDataList).to_csv(path_or_buf = (sourceFolder + "\\.mediaMetaData.csv"), sep = ";")
