@@ -1,4 +1,4 @@
-from extraction.extractionMain import extractData
+from extraction.extraction import extractData
 from transformation.transformationMain import transformData
 from transformation.datetime.datetimeEstimation import estimateStamp
 
