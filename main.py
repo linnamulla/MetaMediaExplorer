@@ -59,9 +59,13 @@ def renameFilesFromDataFrame(df: pd.DataFrame) -> None:
                                removeNonAlpha(str(row['file']).split('.')[0]) + \
                                str(row['type'])
         else:
-            newFileName: str = row_indicated_for_filename + "_" + \
-                               removeNonAlpha(str(row['folder'])) + \
-                               str(row['type'])
+            if removeNonAlpha(str(row['folder'])) == "":
+                newFileName: str = row_indicated_for_filename + \
+                str(row['type'])
+            else:
+                newFileName: str = row_indicated_for_filename + "_" + \
+                removeNonAlpha(str(row['folder'])) + \
+                str(row['type'])
             
         directory: str = os.path.dirname(initialPath)
         newPath: str = os.path.join(directory, newFileName)

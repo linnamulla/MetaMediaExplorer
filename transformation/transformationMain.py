@@ -35,4 +35,3 @@ def transformData(sourceFolder: str, dropEmptyCols: bool = True, dropFloatCols: 
     df.to_csv(path_or_buf = (sourceFolder + "\\.mediaMetaData.csv"), sep = ";", index = True)
 
     print("INDICTATED END OF MODULE TRANSFORMATIONMAIN")
-

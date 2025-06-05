@@ -11,56 +11,6 @@ def reorderColumns(df: pd.DataFrame) -> None:
     cols[6:6] = colsDateTime
     df: pd.DataFrame = df[cols]
 
-def cleanDateTime(df: pd.DataFrame) -> None:
-    ## Clean values in the recorded column
-    for i in range(len(df["recorded"])):
-        try:
-            if int(str(df["recorded"][i])[0:4]) > datetime.now().year or int(str(df["recorded"][i])[0:4]) < 2000:
-                df.loc[i, "recorded"] = None
-        except ValueError:
-            df.loc[i, "recorded"] = None
-
-def selectDateTime(df, dateTimeCol='DateTime', recordedCol='recorded', modifiedCol='modified', creationCol='creation', newCol='filtered') -> pd.DataFrame:
-    print("INDICATED START OF MODULE DATETIMEFILTER")
-
-    filtered = []
-    for index, row in df.iterrows():
-        try:
-            dateTimeVal = row[dateTimeCol] if pd.notna(row[dateTimeCol]) else None
-            recordedVal = row[recordedCol] if pd.notna(row[recordedCol]) else None
-            modifiedVal = row[modifiedCol] if pd.notna(row[modifiedCol]) else None
-            creationVal = row[creationCol] if pd.notna(row[creationCol]) else None
-
-            if recordedVal is not None:
-                if dateTimeVal is not None:
-                    if str(dateTimeVal).replace(": ", "") < str(recordedVal).replace(": ", ""):
-                        filtered.append(dateTimeVal)
-                    else:
-                        filtered.append(recordedVal)
-                else:
-                    filtered.append(recordedVal)
-            elif modifiedVal is not None and creationVal is not None:
-                if str(modifiedVal).replace(": ", "") <= str(creationVal).replace(": ", ""):
-                    filtered.append(modifiedVal)
-                else:
-                    filtered.append(creationVal)
-            elif modifiedVal is not None:
-                filtered.append(modifiedVal)
-            elif creationVal is not None:
-                filtered.append(creationVal)
-            else:
-                filtered.append(None)
-        except (ValueError, TypeError):
-            print(f"ValueError or TypeError occurred at index {index}")
-            filtered.append(None)
-
-    df.insert(6, newCol, filtered)
-    print("TRY 02")
-    df["indicated"] = df["filtered"].astype(str).str.replace(":", "", regex=False).str.replace(" ", "_", regex=False)
-    
-    print("INDICATED END OF MODULE DATETIMEFILTER")
-    return df
-
 def filterDateTime(df: pd.DataFrame) -> None:
     ## Clean values in the recorded column
     for i in range(len(df["recorded"])):
@@ -69,3 +19,47 @@ def filterDateTime(df: pd.DataFrame) -> None:
                 df.loc[i, "recorded"] = None
         except ValueError:
             df.loc[i, "recorded"] = None
+
+def selectDateTime(df, dateTimeCol='DateTime', recordedCol='recorded', modifiedCol='modified', creationCol='creation', newCol='filtered') -> None:
+    if dateTimeCol not in df.columns:
+        dateTimeCol = 'creation'
+
+    filtered = []
+    for index, row in df.iterrows():
+        try:
+            dateTimeVal = int(str(row[dateTimeCol])[:4]) if pd.notna(row[dateTimeCol]) else None
+            try:
+                recordedVal = int(str(row[recordedCol])[:4]) if pd.notna(row[recordedCol]) else None
+            except KeyError:
+                recordedVal = None
+            modifiedVal = int(str(row[modifiedCol])[:4]) if pd.notna(row[modifiedCol]) else None
+            creationVal = int(str(row[creationCol])[:4]) if pd.notna(row[creationCol]) else None
+
+            if recordedVal:
+                if dateTimeVal:
+                    if dateTimeVal < recordedVal:
+                        filtered.append(row[dateTimeCol])
+                    elif dateTimeVal > recordedVal:
+                        filtered.append(row[recordedCol])
+                else:
+                    filtered.append(row[recordedCol])
+            elif modifiedVal and creationVal:
+                if modifiedVal <= creationVal:
+                    filtered.append(row[modifiedCol])
+                else:
+                    filtered.append(row[creationCol])
+            elif modifiedVal:
+                filtered.append(row[creationCol])
+
+
+            else:
+                filtered.append(row[creationCol])
+
+        except ValueError:
+            filtered.append(None)
+
+    df.insert(6, newCol, filtered)
+
+    df["indicated"] = df["filtered"].astype(str).str.replace(":", "", regex=False).str.replace(" ", "_", regex=False)
+
+    return df
