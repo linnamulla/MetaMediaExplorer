@@ -59,7 +59,7 @@ def processString(inputString: str) -> str:
         # Step 3: Apply new conditional checks based on length
         if currentLength < 8:
             # If less than 8 characters, make the result empty
-            finalString = ""
+            finalString = "19700101_000000"  # Default value for empty strings
         elif currentLength == 8:
             # If exactly 8 characters, don't add any spaces
             finalString = truncatedString
