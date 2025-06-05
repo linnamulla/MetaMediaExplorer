@@ -62,4 +62,10 @@ def selectDateTime(df, dateTimeCol='DateTime', recordedCol='recorded', modifiedC
     return df
 
 def filterDateTime(df: pd.DataFrame) -> None:
-    None
+    ## Clean values in the recorded column
+    for i in range(len(df["recorded"])):
+        try:
+            if int(str(df["recorded"][i])[0:4]) > datetime.now().year or int(str(df["recorded"][i])[0:4]) < 2000:
+                df.loc[i, "recorded"] = None
+        except ValueError:
+            df.loc[i, "recorded"] = None
