@@ -1,6 +1,6 @@
 import pandas as pd
 import re
-from transformation.datetimeFilter import reorderColumns, filterDateTime, selectDateTime
+from transformation.datetimeFilter import filterDateTime, selectDateTime
 
 def transformData(sourceFolder: str, dropEmptyCols: bool = True, dropFloatCols: bool = True) -> None:
     print("INDICATED START OF MODULE TRANSFORMATIONMAIN")
@@ -8,7 +8,6 @@ def transformData(sourceFolder: str, dropEmptyCols: bool = True, dropFloatCols: 
     df: pd.DataFrame = pd.read_csv(sourceFolder + "\\.mediaMetaData.csv", sep = ";")
 
     # Reorder the columns of the dataframe, filter the date and time columns and select the date and time column
-    reorderColumns(df)
     filterDateTime(df)
     selectDateTime(df)
 
