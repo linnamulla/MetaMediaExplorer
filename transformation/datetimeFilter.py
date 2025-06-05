@@ -21,6 +21,7 @@ def cleanDateTime(df: pd.DataFrame) -> None:
             df.loc[i, "recorded"] = None
 
 def selectDateTime(df, dateTimeCol='DateTime', recordedCol='recorded', modifiedCol='modified', creationCol='creation', newCol='filtered') -> pd.DataFrame:
+    print("INDICATED START OF MODULE DATETIMEFILTER")
 
     filtered = []
     for index, row in df.iterrows():
@@ -54,7 +55,10 @@ def selectDateTime(df, dateTimeCol='DateTime', recordedCol='recorded', modifiedC
             filtered.append(None)
 
     df.insert(6, newCol, filtered)
+    print("TRY 02")
     df["indicated"] = df["filtered"].astype(str).str.replace(":", "", regex=False).str.replace(" ", "_", regex=False)
+    
+    print("INDICATED END OF MODULE DATETIMEFILTER")
     return df
 
 def filterDateTime(df: pd.DataFrame) -> None:

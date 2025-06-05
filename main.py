@@ -1,6 +1,5 @@
 from extraction.extraction import extractData
 from transformation.transformationMain import transformData
-from transformation.datetime.datetimeEstimation import estimateStamp
 
 import os
 import pandas as pd
@@ -18,7 +17,6 @@ def main() -> str:
             try:
                 extractData(sourceFolder)
                 transformData(sourceFolder, dropEmptyCols = True, dropFloatCols = True)
-                estimateStamp(sourceFolder)
                 print("\nData extraction and transformation completed successfully.\n")
             except OSError as e:
                 print(str(e), "OSError. Likely causes are: (1) files are being downloaded from cloud access and can't be accessed, or (2) the .csv file is opened by the user and can't be overwritten.", sep = "\n")
