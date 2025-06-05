@@ -8,8 +8,8 @@ def transformData(sourceFolder: str, dropEmptyCols: bool = True, dropFloatCols: 
     df: pd.DataFrame = pd.read_csv(sourceFolder + "\\.mediaMetaData.csv", sep = ";")
 
     # Reorder the columns of the dataframe, filter the date and time columns and select the date and time column
-    filterDateTime(df)
-    selectDateTime(df)
+    df = filterDateTime(df)
+    df = selectDateTime(df)
 
     # Set index and sort the dataframe
     ## Drop the first column of the dataframe

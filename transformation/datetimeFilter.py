@@ -1,20 +1,20 @@
 from datetime import datetime
 import pandas as pd
 
-def filterDateTime(df: pd.DataFrame) -> None:
+def filterDateTime(df: pd.DataFrame) -> pd.DataFrame:
     ## Clean values in the recorded column
     for i in range(len(df["recorded"])):
-        print(df["recorded"][i])
-        break
         try:
             if int(str(df["recorded"][i])[0:4]) > datetime.now().year or int(str(df["recorded"][i])[0:4]) < 2000:
                 df.loc[i, "recorded"] = None
         except ValueError:
             df.loc[i, "recorded"] = None
 
-def selectDateTime(df, dateTimeCol='DateTime', recordedCol='recorded', modifiedCol='modified', creationCol='creation', newCol='filtered') -> None:
+def selectDateTime(df, dateTimeCol='DateTime', recordedCol='recorded', modifiedCol='modified', creationCol='creation', newCol='filtered') -> pd.DataFrame:
     if dateTimeCol not in df.columns:
         dateTimeCol = 'creation'
+
+    print(f"INDICATED START OF MODULE DATETIMEFILTER with dateTimeCol: {dateTimeCol}, recordedCol: {recordedCol}, modifiedCol: {modifiedCol}, creationCol: {creationCol}, newCol: {newCol}")
 
     filtered = []
     for index, row in df.iterrows():
