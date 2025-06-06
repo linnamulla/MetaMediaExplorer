@@ -17,14 +17,14 @@ def filterDateTime(df: pd.DataFrame) -> None:
 
     # Attempt to extract the first 4 characters and convert to numeric year.
     # `errors="coerce"` will turn any unparseable strings (like "None", "nan", or shorter strings) into NaN.
-    yearsExtracted = pd.to_numeric(df["recorded"].str[:4], errors="coerce")
-
-    currentYear = datetime.now().year
+    yearsExtracted: int = pd.to_numeric(df["recorded"].str[:4], errors="coerce")
+    # Get the current year for comparison.
+    currentYear: int = datetime.now().year
 
     # Create a boolean mask for values that should be set to None:
     # 1. Where year extraction resulted in NaN (meaning invalid format/missing).
     # 2. Where the extracted year is outside the valid range ( > currentYear or < 2000).
-    maskToNull = yearsExtracted.isna() | ((yearsExtracted > currentYear) | (yearsExtracted < 2000))
+    maskToNull: bool = yearsExtracted.isna() | ((yearsExtracted > currentYear) | (yearsExtracted < 2000))
 
     # Apply the mask to set the 'recorded' column values to None where conditions are met.
     # Using `None` will allow Pandas to represent missing values as `NaN` where appropriate,
@@ -54,7 +54,7 @@ def selectDateTime(df: pd.DataFrame, dateTimeCol: str = "DateTime", recordedCol:
 
     # If dateTimeCol doesn't exist, default to creationCol
     if dateTimeCol not in df.columns:
-        dateTimeCol = "creation"
+        dateTimeCol: str = "creation"
 
     def _getYearFromColumn(rowVal) -> int | None:
         """
@@ -75,16 +75,16 @@ def selectDateTime(df: pd.DataFrame, dateTimeCol: str = "DateTime", recordedCol:
         Helper function to apply row-wise. Determines the "filtered" value for a single row.
         """
         # Safely get year integers for comparison
-        dtYear = _getYearFromColumn(row.get(dateTimeCol))
-        recYear = _getYearFromColumn(row.get(recordedCol))
-        modYear = _getYearFromColumn(row.get(modifiedCol))
-        creYear = _getYearFromColumn(row.get(creationCol))
+        dtYear: int = _getYearFromColumn(row.get(dateTimeCol))
+        recYear: int = _getYearFromColumn(row.get(recordedCol))
+        modYear: int = _getYearFromColumn(row.get(modifiedCol))
+        creYear: int = _getYearFromColumn(row.get(creationCol))
 
         # Retrieve original string values (not years) for the final result
-        dtValStr = row.get(dateTimeCol)
-        recValStr = row.get(recordedCol)
-        modValStr = row.get(modifiedCol)
-        creValStr = row.get(creationCol)
+        dtValStr: str = row.get(dateTimeCol)
+        recValStr: str = row.get(recordedCol)
+        modValStr: str = row.get(modifiedCol)
+        creValStr: str = row.get(creationCol)
 
         # --- Decision Logic based on original code ---
         if recYear is not None:
@@ -112,7 +112,7 @@ def selectDateTime(df: pd.DataFrame, dateTimeCol: str = "DateTime", recordedCol:
 
     # Apply the helper function row-wise to create the new "filtered" Series.
     # This automatically ensures the Series has the same length and index as the DataFrame.
-    filteredSeries = df.apply(_calculateFilteredValue, axis=1)
+    filteredSeries: pd.Series = df.apply(_calculateFilteredValue, axis=1)
 
     # Insert the Series into the DataFrame at the specified location.
     # The .copy() is crucial here to ensure df is not modified in-place and to return a new DataFrame.

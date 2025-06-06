@@ -1,5 +1,4 @@
 import pandas as pd
-from transformation.datetimeFilter import filterDateTime, selectDateTime
 
 #### DATA TRANSFORMATION ####
 ## This module is used to transform the data extracted from image and video files. It reads the metadata from a CSV file, filters and selects date and time columns, sets the index, sorts the dataframe, drops empty columns, and drops float columns (except for GPSInfo). The transformed data is then saved back to the CSV file.
@@ -10,6 +9,7 @@ def transformData(sourceFolder: str, dropEmptyCols: bool = True, dropFloatCols: 
     df: pd.DataFrame = pd.read_csv(sourceFolder + "\\.mediaMetaData.csv", sep = ";")
 
     # Filter and select date and time columns
+    from transformation.datetimeFilter import filterDateTime, selectDateTime
     ## This function cleans the 'recorded' column by setting values to None if their year is outside the 2000-current_year range or if the year cannot be parsed.
     filterDateTime(df)
     ## This function selects the most appropriate date/time value for each row based on a set of rules and inserts it into a new column.
