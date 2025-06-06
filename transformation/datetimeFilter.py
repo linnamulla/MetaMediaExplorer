@@ -70,60 +70,67 @@ def selectDateTime(df: pd.DataFrame, dateTimeCol: str = "DateTime", recordedCol:
                     pass # Conversion failed, fall through to return None
         return None
 
-    def _calculateFilteredValue(row) -> str | None:
+    # --- Optimized Helper Function (from our previous discussion) ---
+    def get_filtered_value_lambda_optimized(recordedYear, dateTimeYear, modifiedYear, creationYear,
+                                            recordedValue, dateTimeValue, modifiedValue, creationValue) -> str | None:
+        """
+        Determines the filtered value based on the provided years and associated values,
+        optimized for efficiency using a lambda function.
+
+        Args:
+            recordedYear (int/None): The year of the recorded value.
+            dateTimeYear (int/None): The year of the datetime value.
+            modifiedYear (int/None): The year of the modified value.
+            creationYear (int/None): The year of the creation value.
+            recordedValue: The value associated with recordedYear.
+            dateTimeValue: The value associated with dateTimeYear.
+            modifiedValue: The value associated with modifiedYear.
+            creationValue: The value associated with creationYear.
+
+        Returns:
+            The filtered value based on the logic.
+            Exits the program if no valid date/time values are found.
+        """
+        available_dates = []
+        if recordedYear is not None:
+            available_dates.append((recordedYear, recordedValue))
+        if dateTimeYear is not None:
+            available_dates.append((dateTimeYear, dateTimeValue))
+        if modifiedYear is not None:
+            available_dates.append((modifiedYear, modifiedValue))
+        if creationYear is not None:
+            available_dates.append((creationYear, creationValue))
+
+        if not available_dates:
+            print("No valid date/time values found for row. Exiting program to prevent issues.")
+            exit()
+
+        min_date_tuple = min(available_dates, key=lambda x: x[0])
+        return min_date_tuple[1]
+
+    # --- Your _calculateFilteredValue function, now using the optimized helper ---
+    def _calculateFilteredValue(row: dict) -> str | None:
         """
         Helper function to apply row-wise. Determines the "filtered" value for a single row.
         """
         # Safely get year integers for comparison
-        dateTimeYear: int = _getYearFromColumn(row.get(dateTimeCol))
-        recordedYear: int = _getYearFromColumn(row.get(recordedCol))
-        modifiedYear: int = _getYearFromColumn(row.get(modifiedCol))
-        creationYear: int = _getYearFromColumn(row.get(creationCol))
+        # Important: Ensure _getYearFromColumn can handle None and returns int | None
+        dateTimeYear: int | None = _getYearFromColumn(row.get(dateTimeCol))
+        recordedYear: int | None = _getYearFromColumn(row.get(recordedCol))
+        modifiedYear: int | None = _getYearFromColumn(row.get(modifiedCol))
+        creationYear: int | None = _getYearFromColumn(row.get(creationCol))
 
         # Retrieve original string values (not years) for the final result
-        dateTimeValue: str = row.get(dateTimeCol)
-        recordedValue: str = row.get(recordedCol)
-        modifiedValue: str = row.get(modifiedCol)
-        creationValue: str = row.get(creationCol)
+        dateTimeValue: str | None = row.get(dateTimeCol)
+        recordedValue: str | None = row.get(recordedCol)
+        modifiedValue: str | None = row.get(modifiedCol)
+        creationValue: str | None = row.get(creationCol)
 
-        # Run the logic to determine the filtered value based on the years
-        if recordedYear is not None and dateTimeYear is not None: # Both recorded and datetime values are present
-            return dateTimeValue if dateTimeYear > 2000 else recordedValue
-            
-        elif recordedYear is not None and dateTimeYear is None: # Only recorded value is present
-            if modifiedYear is not None and creationYear is not None:
-                if recordedYear <= modifiedYear:
-                    return recordedValue
-                else:
-                    return modifiedValue if modifiedYear <= creationYear else creationValue
-            elif modifiedYear is None and creationYear is not None:
-                return recordedValue if recordedYear <= creationYear else creationValue
-            elif modifiedYear is not None and creationYear is None:
-                return recordedValue if recordedYear <= modifiedYear else modifiedValue
-            else:
-                print("No valid date/time values found for row. Exiting program to prevent issues.")
-                exit()
-                
-        elif recordedYear is None and dateTimeYear is not None and modifiedYear is not None:
-            return dateTimeValue if dateTimeYear <= modifiedYear else modifiedValue
-        
-        elif recordedYear is None and dateTimeYear is not None and modifiedYear is None:
-            return dateTimeValue if dateTimeYear <= creationYear else creationValue
-                
-        elif recordedYear is None and dateTimeYear is None: # Neither recorded nor datetime values are present
-            if modifiedYear is not None and creationYear is not None:
-                return modifiedValue if modifiedYear <= creationYear else creationValue
-            elif modifiedYear is None and creationYear is not None:
-                return creationValue
-            elif modifiedYear is not None and creationYear is None:
-                return modifiedValue
-            else:
-                    print("No valid date/time values found for row. Exiting program to prevent issues.")
-                    exit()
-
-        else:
-            print("No valid date/time values found for row. Exiting program to prevent issues.")
-            exit()
+        # Call the optimized helper function
+        return get_filtered_value_lambda_optimized(
+            recordedYear, dateTimeYear, modifiedYear, creationYear,
+            recordedValue, dateTimeValue, modifiedValue, creationValue
+        )
 
     # Apply the helper function row-wise to create the new "filtered" Series.
     # This automatically ensures the Series has the same length and index as the DataFrame.

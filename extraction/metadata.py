@@ -62,10 +62,6 @@ def processString(inputString: str) -> str:
             # Otherwise, add an underscore after the 8th character
             finalString = truncatedString[:8] + "_" + truncatedString[8:]
 
-        if finalString is not None:
-            print(f"Processed timestamp: {finalString} from input: {inputString}")
-        else:
-            print("No timestamp could be processed from the input string.")
         return finalString
 
 ## This function is used to get the creation and modified time of the file. It returns a tuple containing the creation time and modified time as strings in the 'YYYYMMDD_HHMMSS' format.
@@ -73,10 +69,6 @@ def getCreationModifiedTime(path: str) -> tuple[str, str]:
     fileCreation: str = time.strftime('%Y%m%d_%H%M%S', time.gmtime(os.path.getctime(path)))
     fileModified: str = time.strftime('%Y%m%d_%H%M%S', time.gmtime(os.path.getmtime(path)))
     fileRecorded: str = processString(os.path.basename(path))
-    if fileRecorded is not None:
-        print(fileRecorded, "is the recorded time of the file.\n")
-    else:
-        print("No recorded time could be processed from the file name.\n")
 
     return fileCreation, fileModified, fileRecorded
 
