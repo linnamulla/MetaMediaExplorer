@@ -1,7 +1,6 @@
 from dateutil.parser import *
 import os
-from PIL import Image
-from PIL.ExifTags import TAGS
+from PIL import Image; from PIL.ExifTags import TAGS
 import re
 import time
 
@@ -9,22 +8,15 @@ import time
 ## This module is used to extract the regular meta data from both image and video files. Regular meta data includes the file path, file name, folder name, file type, file size, creation time, modified time, and app name. The app name is determined based on the file name prefix and is stored in the metadata dictionary. The creation and modified times are formatted as strings in the 'YYYYMMDD_HHMMSS' format. This module does not work for files that do not have regular meta data, such as text files or other types of files. 
 
 ## This function is used to get the app name from the file name and strip the file name of any prefixes or suffixes that are not needed. It returns a tuple containing the stripped file name and the app name.
-def getFileStripped(file: str) -> tuple[str, str]:
-    if file.startswith(("IMG", "VID")):
-        fileStripped: str = file[3:].lstrip("-_")
-        if "WA" in file:
-            fileStripped: str = file.split("WA")[0].rstrip("-_ ")
-            fileApp: str = "WhatsApp" # Get the app name from the file name
-        else:
-            fileApp: str = None
+def getFileApp(file: str) -> tuple[str, str]:
+    if file.startswith(("IMG", "VID")) and "WA" in file:
+        fileApp: str = "WhatsApp" # Given that the file starts with "IMG" or "VID" and contains "WA", it is assumed to be a WhatsApp media file.
     elif file.startswith(("Screenshot", "SVID")):
-        fileStripped: str = file[10:].lstrip("-_")
-        fileApp: str = file[27:].rsplit(".", 1)[0] # Get the app name from the file name
+        fileApp: str = file[27:].rsplit(".", 1)[0] # Given that the file starts with "Screenshot" or "SVID", it is assumed to be a screenshot or screen recording, and the app name is extracted from the file name.
     else:
-        fileStripped: str = file # No stripping needed
         fileApp: str = None # No app name in the file name
         
-    return fileStripped, fileApp
+    return fileApp
 
 ## This function is used to process a string according to specific rules. The result is a string that is formatted based on the length of the input string after removing non-numerical characters and truncating it to 14 characters. The function applies the following rules:
 def processString(inputString: str) -> str:
@@ -92,7 +84,7 @@ def getRegularData(roots: str, file: str) -> tuple[str, dict[str: str]]:
     # Get the creation and modified time of the file
     fileCreation, fileModified, fileRecorded = getCreationModifiedTime(path)
     # Get the app name from the file name
-    _, fileApp = getFileStripped(file)
+    fileApp = getFileApp(file)
     
     # Create a dictionary with the regular metadata
     metaDataDictionary: dict[str : str] = {"path": path,
@@ -136,7 +128,6 @@ def getExifData(path: str, metaDataDictionary: dict) -> dict[str: str]:
 ## This module is used to get a list of dictionaries containing the meta data of all files in a folder. It uses the os module to walk through the folder and its subfolders, and the getRegularData and getExifData functions to retrieve the regular and exif meta data of each file. The supported file types are specified as a list of tuples, where each tuple contains the file extension for image and video files respectively. The function returns a list of dictionaries containing the meta data of all files in the folder. This list of dictionaries can be used for further processing, such as filtering, sorting, or exporting to a CSV file, by making use of the pandas library.
 
 def getDataDictionaryList(sourceFolder: str, supportedTypes: list[tuple]) -> list[dict]:
-    print("INDICATED START OF MODULE METADATA")
 
     # Create an empty list to store the metadata dictionaries
     metaDataDictionaryList: list = []
@@ -163,12 +154,9 @@ def getDataDictionaryList(sourceFolder: str, supportedTypes: list[tuple]) -> lis
                     metaDataDictionaryList.append(metaDataDictionary)
                                                
                 else: # For other files
-                     
                      print(f"Cannot access metadata for file: {file} - moving on...")
 
     # Return the list of metadata dictionaries
-
-    print("INDICATED END OF MODULE METADATA")
     return metaDataDictionaryList
 
 #### ####

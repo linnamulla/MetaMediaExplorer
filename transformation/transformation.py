@@ -1,14 +1,18 @@
 import pandas as pd
-import re
 from transformation.datetimeFilter import filterDateTime, selectDateTime
 
-def transformData(sourceFolder: str, dropEmptyCols: bool = True, dropFloatCols: bool = True) -> None:
-    print("INDICATED START OF MODULE TRANSFORMATIONMAIN")
+#### DATA TRANSFORMATION ####
+## This module is used to transform the data extracted from image and video files. It reads the metadata from a CSV file, filters and selects date and time columns, sets the index, sorts the dataframe, drops empty columns, and drops float columns (except for GPSInfo). The transformed data is then saved back to the CSV file.
 
+def transformData(sourceFolder: str, dropEmptyCols: bool = True, dropFloatCols: bool = True) -> None:
+
+    # Read the metadata from the CSV file
     df: pd.DataFrame = pd.read_csv(sourceFolder + "\\.mediaMetaData.csv", sep = ";")
 
-    # Reorder the columns of the dataframe, filter the date and time columns and select the date and time column
+    # Filter and select date and time columns
+    ## This function cleans the 'recorded' column by setting values to None if their year is outside the 2000-current_year range or if the year cannot be parsed.
     filterDateTime(df)
+    ## This function selects the most appropriate date/time value for each row based on a set of rules and inserts it into a new column.
     selectDateTime(df)
 
     # Set index and sort the dataframe
@@ -23,6 +27,7 @@ def transformData(sourceFolder: str, dropEmptyCols: bool = True, dropFloatCols: 
         df: pd.DataFrame = df.dropna(axis = 1, how = "all")
 
     # Drop columns with data type float64, except the GPSInfo column
+    ## This removes columns that are of type float64, which are typically used for numerical data, but keeps the GPSInfo column if it exists. This is useful for cleaning up the dataframe and removing unnecessary columns that may not be relevant for further analysis.
     if dropFloatCols == True:
         df: pd.DataFrame = df.drop(df.select_dtypes(include = ["float64"]).columns.difference(["GPSInfo"]), axis = 1)
 
@@ -30,7 +35,7 @@ def transformData(sourceFolder: str, dropEmptyCols: bool = True, dropFloatCols: 
     print("\nShowing columns for dataframe:\n")
     print(df.info(verbose = True, show_counts = True))
 
-    # Save the dataframe as a csv file
+    # Save the transformed dataframe to a CSV file
     df.to_csv(path_or_buf = (sourceFolder + "\\.mediaMetaData.csv"), sep = ";", index = True)
 
-    print("INDICTATED END OF MODULE TRANSFORMATIONMAIN")
+#### ####
