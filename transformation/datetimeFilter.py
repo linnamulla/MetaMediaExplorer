@@ -59,7 +59,7 @@ def selectDateTime(df: pd.DataFrame, dateTimeCol: str = "DateTime", recordedCol:
     def _getYearFromColumn(rowVal) -> int | None:
         """
         Safely extracts the first 4 characters from a value and converts to an integer year.
-        Returns None if the value is missing, not string-like, or year conversion fails.
+        Returns None if the value is missing, not string-like, or year conversion fanewColils.
         """
         if pd.notna(rowVal):
             sVal = str(rowVal)
@@ -78,79 +78,44 @@ def selectDateTime(df: pd.DataFrame, dateTimeCol: str = "DateTime", recordedCol:
         dateTimeYear: int = _getYearFromColumn(row.get(dateTimeCol))
         recordedYear: int = _getYearFromColumn(row.get(recordedCol))
         modifiedYear: int = _getYearFromColumn(row.get(modifiedCol))
-        createdYear: int = _getYearFromColumn(row.get(creationCol))
+        creationYear: int = _getYearFromColumn(row.get(creationCol))
 
         # Retrieve original string values (not years) for the final result
         dateTimeValue: str = row.get(dateTimeCol)
         recordedValue: str = row.get(recordedCol)
         modifiedValue: str = row.get(modifiedCol)
-        createdValue: str = row.get(creationCol)
+        creationValue: str = row.get(creationCol)
 
         # Run the logic to determine the filtered value based on the years
         if recordedYear is not None and dateTimeYear is not None: # Both recorded and datetime values are present
-            if dateTimeYear <= recordedYear and dateTimeYear > 2000:
-                return dateTimeValue
-            else:
-                return recordedValue
+            return dateTimeValue if dateTimeYear > 2000 else recordedValue
             
         elif recordedYear is not None and dateTimeYear is None: # Only recorded value is present
-            if modifiedYear is not None and createdYear is not None:
+            if modifiedYear is not None and creationYear is not None:
                 if recordedYear <= modifiedYear:
                     return recordedValue
                 else:
-                    if modifiedYear <= createdYear:
-                        return modifiedValue
-                    else:
-                        return createdValue
-            elif modifiedYear is None and createdYear is not None:
-                if recordedYear <= createdYear:
-                    return recordedValue
-                else:
-                    return createdValue
-            elif modifiedYear is not None and createdYear is None:
-                if recordedYear <= modifiedYear:
-                    return recordedValue
-                else:
-                    return modifiedValue
+                    return modifiedValue if modifiedYear <= creationYear else creationValue
+            elif modifiedYear is None and creationYear is not None:
+                return recordedValue if recordedYear <= creationYear else creationValue
+            elif modifiedYear is not None and creationYear is None:
+                return recordedValue if recordedYear <= modifiedYear else modifiedValue
             else:
                 print("No valid date/time values found for row. Exiting program to prevent issues.")
                 exit()
                 
-        elif recordedYear is None and dateTimeYear is not None: # Only datetime value is present
-            if modifiedYear is not None and createdYear is not None:
-                if modifiedYear <= createdYear:
-                    if dateTimeYear < 2000:
-                        return modifiedValue
-                    else:
-                        return dateTimeValue
-                else:
-                    if dateTimeYear < 2000:
-                        return createdValue
-                    else:
-                        return dateTimeValue
-            elif modifiedYear is None and createdYear is not None:
-                if dateTimeYear < 2000:
-                    return createdValue
-                else:
-                    return dateTimeValue
-            elif modifiedYear is not None and createdYear is None:
-                if dateTimeYear < 2000:
-                    return modifiedValue
-                else:
-                    return dateTimeValue
-            else: 
-                print("No valid date/time values found for row. Exiting program to prevent issues.")
-                exit()
+        elif recordedYear is None and dateTimeYear is not None and modifiedYear is not None:
+            return dateTimeValue if dateTimeYear <= modifiedYear else modifiedValue
+        
+        elif recordedYear is None and dateTimeYear is not None and modifiedYear is None:
+            return dateTimeValue if dateTimeYear <= creationYear else creationValue
                 
         elif recordedYear is None and dateTimeYear is None: # Neither recorded nor datetime values are present
-            if modifiedYear is not None and createdYear is not None:
-                if modifiedYear <= createdYear:
-                    return modifiedValue
-                else:
-                    return createdValue
-            elif modifiedYear is None and createdYear is not None:
-                return createdValue
-            elif modifiedYear is not None and createdYear is None:
+            if modifiedYear is not None and creationYear is not None:
+                return modifiedValue if modifiedYear <= creationYear else creationValue
+            elif modifiedYear is None and creationYear is not None:
+                return creationValue
+            elif modifiedYear is not None and creationYear is None:
                 return modifiedValue
             else:
                     print("No valid date/time values found for row. Exiting program to prevent issues.")
