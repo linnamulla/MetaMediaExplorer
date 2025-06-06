@@ -1,5 +1,5 @@
 import pandas as pd
-import PIL
+import PIL; from PIL import Image
 
 #### DATA EXTRACTION ####
 ## This module is used to extract data from image and video files in a specified folder. It retrieves metadata from exif data for images and regular metadata for both images and videos. The supported file types are specified as a list of tuples, where each tuple contains the file extensions for image and video files respectively. The function `extractData` takes a source folder path and an optional maximum image pixel limit to avoid decompression bomb errors. It retrieves the metadata for all files in the folder and its subfolders, and saves the extracted data as a CSV file in the source folder.

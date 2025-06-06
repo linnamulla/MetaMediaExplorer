@@ -69,10 +69,7 @@ def renameFilesFromDataFrame(df: pd.DataFrame) -> None:
 #### MAIN FUNCTION ####        
 ## This is the main function that runs the program. It prompts the user for the source folder, checks if it exists, and then calls the extractData and transformData functions to extract and transform the data. It also reads the CSV file and renames files based on the DataFrame.
 
-def main() -> None: 
-    print("\nPlease enter name of source folder:")
-    sourceFolder: str = input("")
-
+def main(sourceFolder: str) -> None: 
     # Check if the source folder is provided and exists
     if sourceFolder is None:
         print("No source folder provided. Exiting program.")
@@ -84,15 +81,15 @@ def main() -> None:
         # Attempt to extract and transform data from the source folder
         extractData(sourceFolder)
         transformData(sourceFolder, dropEmptyCols = True, dropFloatCols = True)
-        print("\nData extraction and transformation completed successfully.\n")
+        print("\nData extraction and transformation completed successfully.")
 
-        # Attempt to read the CSV file and rename files based on the DataFrame
-        print("\nRenaming files based on metadata...\n")
+        # Attempt to read the CSV file and rename files based on the DataFrame if this is set to True
         try:
-            while False:
+            if False:
+                print("\nRenaming files based on metadata...")
                 renameFilesFromDataFrame(df = pd.read_csv(sourceFolder + "\\.mediaMetaData.csv", sep=";"))
         
-    # Handle potential errors when reading the CSV file or renaming files
+        # Handle potential errors when reading the CSV file or renaming files
         except FileNotFoundError as e:
             print(f"File not found: {e}. Please ensure the CSV file exists in the source folder.")
             exit()
@@ -100,7 +97,7 @@ def main() -> None:
             print(f"Key error occurred: {e}. Please check the column names in the CSV file.")
             exit()
         except OSError as e:
-            print(f"OS error occurred: {e}. Exiting program.")
+            print(f"OS error occurred: {e}. Please check if the source folder exists, or if the CSV file is currently opened by a user. Exiting program.")
             exit()
         except ValueError as e:
             print(f"Value error occurred: {e}. Please check the data in the CSV file.")
@@ -116,7 +113,9 @@ def main() -> None:
 #### RUN THE MAIN FUNCTION ####
 # This ensures that the main function is called when the script is run directly.
 if __name__ == "__main__":
-    main()
-    print("\nProgram completed successfully.")
+    print("\nPlease enter name of source folder: ")
+    sourceFolder: str = input("")
+    main(sourceFolder)
+    print("\nProgram completed successfully.\n")
     exit()
 #### ####

@@ -10,8 +10,9 @@ def transformData(sourceFolder: str, dropEmptyCols: bool = True, dropFloatCols: 
 
     # Filter and select date and time columns
     from transformation.datetimeFilter import filterDateTime, selectDateTime
-    ## This function cleans the 'recorded' column by setting values to None if their year is outside the 2000-current_year range or if the year cannot be parsed.
-    filterDateTime(df)
+    ## This function cleans up the date and time columns in the dataframe by filtering out invalid values and selecting the most appropriate date/time value for each row.
+    filterDateTime(df, columnName = "recorded")
+    filterDateTime(df, columnName = "DateTime")
     ## This function selects the most appropriate date/time value for each row based on a set of rules and inserts it into a new column.
     selectDateTime(df)
 
@@ -20,7 +21,7 @@ def transformData(sourceFolder: str, dropEmptyCols: bool = True, dropFloatCols: 
     df: pd.DataFrame = df.drop(df.columns[0], axis = 1)
     ## Set index as the path column and sort descending by the filesize column
     df: pd.DataFrame = df.set_index("path")
-    df: pd.DataFrame = df.sort_values(by = "filesize", ascending = False)
+    df: pd.DataFrame = df.sort_values(by = "indicated", ascending = False)
 
     # Drop the empty columns of the dataframe
     if dropEmptyCols == True:
@@ -32,7 +33,8 @@ def transformData(sourceFolder: str, dropEmptyCols: bool = True, dropFloatCols: 
         df: pd.DataFrame = df.drop(df.select_dtypes(include = ["float64"]).columns.difference(["GPSInfo"]), axis = 1)
 
     # Get the information of the dataframe
-    print("\nShowing columns for dataframe:\n")
+    print("\nDataframe information:")
+    print("Columns in current dataframe:\n")
     print(df.info(verbose = True, show_counts = True))
 
     # Save the transformed dataframe to a CSV file

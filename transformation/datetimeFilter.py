@@ -2,37 +2,37 @@ from datetime import datetime
 import pandas as pd
 import numpy as np # Import numpy for np.nan
 
-def filterDateTime(df: pd.DataFrame) -> None:
+def filterDateTime(df: pd.DataFrame, columnName: str = "recorded", yearLimit: int = 2000) -> None:
     """
-    Cleans the 'recorded' column by setting values to None if their year
-    is outside the 2000-current_year range or if the year cannot be parsed.
+    Cleans the 'recorded' column in the DataFrame by setting values to None if their year is outside a specified range
+    or if the year cannot be parsed. This function modifies the DataFrame in place.
 
     Args:
         df (pd.DataFrame): The input DataFrame. Modified in place.
+        columnName (str): The name of the column to clean. Defaults to "recorded".
     """
     # Ensure 'recorded' column is string type for consistent slicing.
     # Convert existing None/NaN to string 'None'/'nan' for `astype(str)`.
     # This ensures that subsequent `.str[:4]` operations don't fail for non-string types.
-    df["recorded"] = df["recorded"].astype(str)
+    df[columnName] = df[columnName].astype(str)
 
     # Attempt to extract the first 4 characters and convert to numeric year.
     # `errors="coerce"` will turn any unparseable strings (like "None", "nan", or shorter strings) into NaN.
-    yearsExtracted: int = pd.to_numeric(df["recorded"].str[:4], errors="coerce")
+    yearsExtracted: int = pd.to_numeric(df[columnName].str[:4], errors="coerce")
     # Get the current year for comparison.
     currentYear: int = datetime.now().year
 
     # Create a boolean mask for values that should be set to None:
     # 1. Where year extraction resulted in NaN (meaning invalid format/missing).
     # 2. Where the extracted year is outside the valid range ( > currentYear or < 2000).
-    maskToNull: bool = yearsExtracted.isna() | ((yearsExtracted > currentYear) | (yearsExtracted < 2000))
+    maskToNull: bool = yearsExtracted.isna() | ((yearsExtracted > currentYear) | (yearsExtracted < yearLimit))
 
     # Apply the mask to set the 'recorded' column values to None where conditions are met.
     # Using `None` will allow Pandas to represent missing values as `NaN` where appropriate,
     # and simplifies `pd.notna()` checks later.
-    df.loc[maskToNull, "recorded"] = None
+    df.loc[maskToNull, columnName] = None
 
-    print(f"Cleaned 'recorded' column. {maskToNull.sum()} entries were set to None.")
-
+    print(f"Cleaned {columnName} column. {maskToNull.sum()} entries were set to None, because they were either invalid or outside the range {yearLimit} - {currentYear}.\n")
 
 def selectDateTime(df: pd.DataFrame, dateTimeCol: str = "DateTime", recordedCol: str = "recorded",
                    modifiedCol: str = "modified", creationCol: str = "creation", newCol: str = "filtered") -> pd.DataFrame:
@@ -86,29 +86,79 @@ def selectDateTime(df: pd.DataFrame, dateTimeCol: str = "DateTime", recordedCol:
         modValStr: str = row.get(modifiedCol)
         creValStr: str = row.get(creationCol)
 
-        # --- Decision Logic based on original code ---
-        if recYear is not None:
-            if dtYear is not None:
-                if dtYear < recYear:
-                    return dtValStr
-                elif dtYear > recYear:
-                    return recValStr
-                else: # dtYear == recYear or other comparison not met
-                    return dtValStr # Original chose dateTimeVal if years were equal
-            else: # dtYear is None but recYear is not None
+        # Run the logic to determine the filtered value based on the years
+        if recYear is not None and dtYear is not None: # Both recorded and datetime values are present
+            if dtYear <= recYear and dtYear > 2000:
+                return dtValStr
+            else:
                 return recValStr
-        elif modYear is not None and creYear is not None: # recYear is None
-            if modYear <= creYear:
+            
+        elif recYear is not None and dtYear is None: # Only recorded value is present
+            if modYear is not None and creYear is not None:
+                if recYear <= modYear:
+                    return recValStr
+                else:
+                    if modYear <= creYear:
+                        return modValStr
+                    else:
+                        return creValStr
+            elif modYear is None and creYear is not None:
+                if recYear <= creYear:
+                    return recValStr
+                else:
+                    return creValStr
+            elif modYear is not None and creYear is None:
+                if recYear <= modYear:
+                    return recValStr
+                else:
+                    return modValStr
+            else:
+                print("No valid date/time values found for row. Exiting program to prevent issues.")
+                exit()
+                
+        elif recYear is None and dtYear is not None: # Only datetime value is present
+            if modYear is not None and creYear is not None:
+                if modYear <= creYear:
+                    if dtYear < 2000:
+                        return modValStr
+                    else:
+                        return dtValStr
+                else:
+                    if dtYear < 2000:
+                        return creValStr
+                    else:
+                        return dtValStr
+            elif modYear is None and creYear is not None:
+                if dtYear < 2000:
+                    return creValStr
+                else:
+                    return dtValStr
+            elif modYear is not None and creYear is None:
+                if dtYear < 2000:
+                    return modValStr
+                else:
+                    return dtValStr
+            else: 
+                print("No valid date/time values found for row. Exiting program to prevent issues.")
+                exit()
+                
+        elif recYear is None and dtYear is None: # Neither recorded nor datetime values are present
+            if modYear is not None and creYear is not None:
+                if modYear <= creYear:
+                    return modValStr
+                else:
+                    return creValStr
+            elif modYear is None and creYear is not None:
+                return creValStr
+            elif modYear is not None and creYear is None:
                 return modValStr
             else:
-                return creValStr
-        elif modYear is not None: # recYear is None, creYear might be None or invalid year
-            # Original code appended creationCol here. This is a potential point of review:
-            # if modifiedVal exists but creationVal doesn't (or is invalid),
-            # should it return modifiedVal or creationVal? Sticking to original:
-            return creValStr
-        else: # recYear is None, modYear is None (and creYear implicitly might be None or handled by outer except)
-            return creValStr
+                    print("No valid date/time values found for row. Exiting program to prevent issues.")
+                    exit()
+
+        else:
+            print("No valid date/time values found for row. Exiting program to prevent issues.")
+            exit()
 
     # Apply the helper function row-wise to create the new "filtered" Series.
     # This automatically ensures the Series has the same length and index as the DataFrame.
