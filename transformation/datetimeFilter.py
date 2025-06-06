@@ -35,7 +35,7 @@ def filterDateTime(df: pd.DataFrame, columnName: str = "recorded", yearLimit: in
     print(f"Cleaned {columnName} column. {maskToNull.sum()} entries were set to None, because they were either invalid or outside the range {yearLimit} - {currentYear}.\n")
 
 def selectDateTime(df: pd.DataFrame, dateTimeCol: str = "DateTime", recordedCol: str = "recorded",
-                   modifiedCol: str = "modified", creationCol: str = "creation", newCol: str = "filtered") -> pd.DataFrame:
+                   modifiedCol: str = "modified", creationCol: str = "creation", newColumn: str = "filtered") -> pd.DataFrame:
     """
     Selects the most appropriate date/time value for each row based on a set of rules
     and inserts it into a new column.
@@ -46,7 +46,7 @@ def selectDateTime(df: pd.DataFrame, dateTimeCol: str = "DateTime", recordedCol:
         recordedCol (str): Name of the "recorded" date/time column. Defaults to "recorded".
         modifiedCol (str): Name of the "modified" date/time column. Defaults to "modified".
         creationCol (str): Name of the "creation" date/time column. Defaults to "creation".
-        newCol (str): Name of the new column to insert. Defaults to "filtered".
+        newColumn (str): Name of the new column to insert. Defaults to "filtered".
 
     Returns:
         pd.DataFrame: The DataFrame with the new "filtered" and "indicated" columns.
@@ -75,83 +75,83 @@ def selectDateTime(df: pd.DataFrame, dateTimeCol: str = "DateTime", recordedCol:
         Helper function to apply row-wise. Determines the "filtered" value for a single row.
         """
         # Safely get year integers for comparison
-        dtYear: int = _getYearFromColumn(row.get(dateTimeCol))
-        recYear: int = _getYearFromColumn(row.get(recordedCol))
-        modYear: int = _getYearFromColumn(row.get(modifiedCol))
-        creYear: int = _getYearFromColumn(row.get(creationCol))
+        dateTimeYear: int = _getYearFromColumn(row.get(dateTimeCol))
+        recordedYear: int = _getYearFromColumn(row.get(recordedCol))
+        modifiedYear: int = _getYearFromColumn(row.get(modifiedCol))
+        createdYear: int = _getYearFromColumn(row.get(creationCol))
 
         # Retrieve original string values (not years) for the final result
-        dtValStr: str = row.get(dateTimeCol)
-        recValStr: str = row.get(recordedCol)
-        modValStr: str = row.get(modifiedCol)
-        creValStr: str = row.get(creationCol)
+        dateTimeValue: str = row.get(dateTimeCol)
+        recordedValue: str = row.get(recordedCol)
+        modifiedValue: str = row.get(modifiedCol)
+        createdValue: str = row.get(creationCol)
 
         # Run the logic to determine the filtered value based on the years
-        if recYear is not None and dtYear is not None: # Both recorded and datetime values are present
-            if dtYear <= recYear and dtYear > 2000:
-                return dtValStr
+        if recordedYear is not None and dateTimeYear is not None: # Both recorded and datetime values are present
+            if dateTimeYear <= recordedYear and dateTimeYear > 2000:
+                return dateTimeValue
             else:
-                return recValStr
+                return recordedValue
             
-        elif recYear is not None and dtYear is None: # Only recorded value is present
-            if modYear is not None and creYear is not None:
-                if recYear <= modYear:
-                    return recValStr
+        elif recordedYear is not None and dateTimeYear is None: # Only recorded value is present
+            if modifiedYear is not None and createdYear is not None:
+                if recordedYear <= modifiedYear:
+                    return recordedValue
                 else:
-                    if modYear <= creYear:
-                        return modValStr
+                    if modifiedYear <= createdYear:
+                        return modifiedValue
                     else:
-                        return creValStr
-            elif modYear is None and creYear is not None:
-                if recYear <= creYear:
-                    return recValStr
+                        return createdValue
+            elif modifiedYear is None and createdYear is not None:
+                if recordedYear <= createdYear:
+                    return recordedValue
                 else:
-                    return creValStr
-            elif modYear is not None and creYear is None:
-                if recYear <= modYear:
-                    return recValStr
+                    return createdValue
+            elif modifiedYear is not None and createdYear is None:
+                if recordedYear <= modifiedYear:
+                    return recordedValue
                 else:
-                    return modValStr
+                    return modifiedValue
             else:
                 print("No valid date/time values found for row. Exiting program to prevent issues.")
                 exit()
                 
-        elif recYear is None and dtYear is not None: # Only datetime value is present
-            if modYear is not None and creYear is not None:
-                if modYear <= creYear:
-                    if dtYear < 2000:
-                        return modValStr
+        elif recordedYear is None and dateTimeYear is not None: # Only datetime value is present
+            if modifiedYear is not None and createdYear is not None:
+                if modifiedYear <= createdYear:
+                    if dateTimeYear < 2000:
+                        return modifiedValue
                     else:
-                        return dtValStr
+                        return dateTimeValue
                 else:
-                    if dtYear < 2000:
-                        return creValStr
+                    if dateTimeYear < 2000:
+                        return createdValue
                     else:
-                        return dtValStr
-            elif modYear is None and creYear is not None:
-                if dtYear < 2000:
-                    return creValStr
+                        return dateTimeValue
+            elif modifiedYear is None and createdYear is not None:
+                if dateTimeYear < 2000:
+                    return createdValue
                 else:
-                    return dtValStr
-            elif modYear is not None and creYear is None:
-                if dtYear < 2000:
-                    return modValStr
+                    return dateTimeValue
+            elif modifiedYear is not None and createdYear is None:
+                if dateTimeYear < 2000:
+                    return modifiedValue
                 else:
-                    return dtValStr
+                    return dateTimeValue
             else: 
                 print("No valid date/time values found for row. Exiting program to prevent issues.")
                 exit()
                 
-        elif recYear is None and dtYear is None: # Neither recorded nor datetime values are present
-            if modYear is not None and creYear is not None:
-                if modYear <= creYear:
-                    return modValStr
+        elif recordedYear is None and dateTimeYear is None: # Neither recorded nor datetime values are present
+            if modifiedYear is not None and createdYear is not None:
+                if modifiedYear <= createdYear:
+                    return modifiedValue
                 else:
-                    return creValStr
-            elif modYear is None and creYear is not None:
-                return creValStr
-            elif modYear is not None and creYear is None:
-                return modValStr
+                    return createdValue
+            elif modifiedYear is None and createdYear is not None:
+                return createdValue
+            elif modifiedYear is not None and createdYear is None:
+                return modifiedValue
             else:
                     print("No valid date/time values found for row. Exiting program to prevent issues.")
                     exit()
@@ -168,10 +168,10 @@ def selectDateTime(df: pd.DataFrame, dateTimeCol: str = "DateTime", recordedCol:
     # The .copy() is crucial here to ensure df is not modified in-place and to return a new DataFrame.
     # If the function is meant to modify in-place and return None, remove the .copy() and the return statement.
     # Given the return type hint `-> pd.DataFrame`, it's safer to return a copy.
-    df.insert(6, newCol, filteredSeries)
+    df.insert(6, newColumn, filteredSeries)
 
     # Process the new "filtered" column to create "indicated"
     # Ensure to handle potential NaNs by converting to string first.
-    df["indicated"] = df[newCol].astype(str).str.replace(":", "", regex=False).str.replace(" ", "_", regex=False)
+    df["indicated"] = df[newColumn].astype(str).str.replace(":", "", regex=False).str.replace(" ", "_", regex=False)
 
     return df
