@@ -10,7 +10,7 @@ def extractData(sourceFolder, maxImagePixels = None, supportedTypes = [(".gif", 
     PIL.Image.MAX_IMAGE_PIXELS = maxImagePixels
 
     # Get the list of metadata dictionaries for all files in the source folder
-    from extraction.metadata import getDataDictionaryList
+    from extraction.metadata.dictionaries import getDataDictionaryList
     ## This function retrieves exif and regular metadata from image and video files in the specified folder and its subfolders.
     metadataList: list[dict] = getDataDictionaryList(sourceFolder, supportedTypes)
 

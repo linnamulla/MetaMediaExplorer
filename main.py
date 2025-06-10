@@ -85,7 +85,7 @@ def main(sourceFolder: str) -> None:
 
         # Attempt to read the CSV file and rename files based on the DataFrame if this is set to True
         try:
-            if False:
+            if True:
                 print("\nRenaming files based on metadata...")
                 renameFilesFromDataFrame(df = pd.read_csv(sourceFolder + "\\.mediaMetaData.csv", sep=";"))
         

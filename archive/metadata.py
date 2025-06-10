@@ -25,7 +25,7 @@ def processString(inputString: str | None) -> str:
         return ""
     elif currentLength == 8:
         return truncatedString
-    elif currentLength in [9, 10, 11, 13]:
+    elif currentLength in [9, 10, 11, 12, 13]:
         return truncatedString[:8]
     else:
         return f"{truncatedString[:8]}_{truncatedString[8:]}"
